@@ -10,7 +10,7 @@ def create_horizontal_bar_chart(data: pd.Series, x_label: str, y_label: str, cha
     """
     The function `create_horizontal_bar_chart` takes in a pandas Series, x and y labels, and a chart
     title, and returns a horizontal bar chart using Plotly.
-    
+
     :param data: The data parameter is a pandas Series object that contains the data for the horizontal
     bar chart. The index of the Series represents the categories or labels for the bars, and the values
     represent the corresponding values or heights of the bars
@@ -23,10 +23,10 @@ def create_horizontal_bar_chart(data: pd.Series, x_label: str, y_label: str, cha
     or content of the chart
     :return: a horizontal bar chart as a `go.Figure` object.
     """
-    df = pd.DataFrame({x_label: data.index, y_label: data.values})
-
-    fig = px.bar(
-        df,
+    chart_data = pd.DataFrame({x_label: data.index, y_label: data.values})
+    print(chart_data)
+    bar_chart_fig = px.bar(
+        chart_data,
         x=y_label,
         y=x_label,
         orientation='h',
@@ -35,14 +35,14 @@ def create_horizontal_bar_chart(data: pd.Series, x_label: str, y_label: str, cha
         text=y_label
     )
 
-    return fig
+    return bar_chart_fig
 
 
 def create_pie_chart(tremp_type_counts: Dict[str, int]) -> go.Figure:
     """
     The function `create_pie_chart` takes in a dictionary of tremp type counts and returns a pie chart
     visualization of the data.
-    
+
     :param tremp_type_counts: The `tremp_type_counts` parameter is a dictionary that contains the counts
     of different types of tremps. The keys of the dictionary represent the tremp types, and the values
     represent the corresponding counts
@@ -50,30 +50,30 @@ def create_pie_chart(tremp_type_counts: Dict[str, int]) -> go.Figure:
     """
     labels = list(tremp_type_counts.keys())
     values = list(tremp_type_counts.values())
-    fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
-    fig.update_layout(title_text="Tremp Type Counts")
-    return fig
+    pie_fig = go.Figure(data=[go.Pie(labels=labels, values=values)])
+    pie_fig.update_layout(title_text="Tremp Type Counts")
+    return pie_fig
 
 
 def create_grouped_bar_chart(gender_month_grouped: pd.DataFrame) -> go.Figure:
     """
     The function creates a grouped bar chart to visualize the gender distribution of hitchhikers per
     month.
-    
+
     :param gender_month_grouped: The parameter `gender_month_grouped` is a DataFrame that contains the
     data for the grouped bar chart. It should have the following columns:
     :return: a bar chart figure object.
     """
-    fig = go.Figure()
+    grouped_fig = go.Figure()
 
     for gender in gender_month_grouped['gender'].unique():
         gender_data = gender_month_grouped[gender_month_grouped['gender'] == gender]
-        fig.add_trace(go.Bar(name=gender, x=gender_data['date'].astype(str), y=gender_data['counts'],
-                             text=gender_data['counts'], textposition='auto'))
+        grouped_fig.add_trace(go.Bar(name=gender, x=gender_data['date'].astype(str), y=gender_data['counts'],
+                                     text=gender_data['counts'], textposition='auto'))
 
-    fig.update_layout(barmode='group', title_text="Gender Distribution for Hitchhikers per Month")
+    grouped_fig.update_layout(barmode='group', title_text="Gender Distribution for Hitchhikers per Month")
 
-    return fig
+    return grouped_fig
 
 
 def render_html(content: str, font_size: int = 20, font_family: str = 'Arial') -> None:

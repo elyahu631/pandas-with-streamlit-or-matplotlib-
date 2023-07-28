@@ -299,15 +299,19 @@ def group_by_gender_and_month(df_users: pd.DataFrame, df_users_in_tremp: pd.Data
     months.
     """
 
-    merged = df_users_in_tremp.merge(df_tremps, on=TREMP_ID_COLUMN)
-    merged = merged.merge(df_users, left_on=USER_ID_COLUMN, right_on=USER_ID_COLUMN)
+    # merge dataframes to get complete information about users,  tremps, and tremp participation
+    tremps_with_users = df_users_in_tremp.merge(df_tremps[[TREMP_ID_COLUMN, DATE_COLUMN]], on=TREMP_ID_COLUMN)
+    merged_data_with_gender = tremps_with_users.merge(df_users[[GENDER_COLUMN, USER_ID_COLUMN]],
+                                                      left_on=USER_ID_COLUMN, right_on=USER_ID_COLUMN)
 
-    gender_month_grouped = merged.groupby([merged[DATE_COLUMN].dt.to_period('M'), GENDER_COLUMN]).size().reset_index(
-        name='counts')
+    # group-by gender and month and calculate the counts for each group
+    gender_month_counts = merged_data_with_gender.groupby(
+        [merged_data_with_gender[DATE_COLUMN].dt.to_period('M'), GENDER_COLUMN]).size().reset_index(name='counts')
 
     # Filter the rows for the last 12 months
-    last_month = gender_month_grouped[DATE_COLUMN].max()
+    last_month = gender_month_counts[DATE_COLUMN].max()
     one_year_ago = last_month - 12
-    filtered_gender_month_grouped = gender_month_grouped[gender_month_grouped[DATE_COLUMN] > one_year_ago]
+    filtered_gender_month_counts = gender_month_counts[gender_month_counts[DATE_COLUMN] > one_year_ago]
 
-    return filtered_gender_month_grouped
+    return filtered_gender_month_counts
+
